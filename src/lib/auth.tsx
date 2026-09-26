@@ -8,6 +8,7 @@ type AuthState = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
+  google: (idToken: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -57,13 +58,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(r.user);
   }, []);
 
+  const google = useCallback(async (idToken: string) => {
+    const r = await api<{ token: string; user: User }>("/auth/google", { method: "POST", json: { id_token: idToken } });
+    setToken(r.token);
+    setUser(r.user);
+  }, []);
+
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     window.location.href = "/login";
   }, []);
 
-  return <Ctx.Provider value={{ user, loading, login, signup, logout }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, loading, login, signup, google, logout }}>{children}</Ctx.Provider>;
 }
 
 export function useAuth() {

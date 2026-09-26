@@ -5,11 +5,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Button, ErrorText, Field, Input } from "@/components/ui";
+import { GoogleButton } from "@/components/google-button";
 import { Logo } from "@/components/logo";
 import { ProductPreview } from "@/components/product-preview";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
-  const { login, signup } = useAuth();
+  const { login, signup, google } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,6 +33,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
   }
 
+  async function googleSignIn(idToken: string) {
+    setError("");
+    try {
+      await google(idToken);
+      router.push("/dashboard");
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
   return (
     <main className="grid min-h-screen bg-white lg:grid-cols-2">
       <div className="flex flex-col px-6 py-8 sm:px-12">
@@ -41,7 +52,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <p className="mt-1.5 text-sm text-muted">
             {mode === "login" ? "Log in to keep your applications moving." : "Set up your profile once. Apply everywhere in minutes."}
           </p>
-          <form onSubmit={submit} className="mt-8 space-y-4">
+          <div className="mt-8">
+            <GoogleButton onCredential={googleSignIn} />
+          </div>
+          <form onSubmit={submit} className="mt-6 space-y-4">
             {mode === "signup" && (
               <Field label="Full name">
                 <Input value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" placeholder="Ada Lovelace" className="h-10" />
