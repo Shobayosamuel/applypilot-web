@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Accent: indigo-violet */
+  --color-brand-50: #f1f1fe;
+  --color-brand-100: #e4e3fd;
+  --color-brand-200: #cac8fb;
+  --color-brand-400: #8c88f2;
+  --color-brand-500: #6d67eb;
+  --color-brand-600: #5a52df;
+  --color-brand-700: #4a42c4;
+  --color-brand-900: #26206b;
+
+  /* Neutrals */
+  --color-ink: #0b0b12;
+  --color-canvas: #f7f7f9;
+  --color-line: #e8e8ee;
+  --color-line-strong: #d9d9e2;
+  --color-muted: #6b6b7b;
+  --color-subtle: #9a9aab;
+
+  --shadow-card: 0 1px 2px rgb(16 16 32 / 0.04), 0 1px 1px rgb(16 16 32 / 0.02);
+  --shadow-pop: 0 12px 32px -8px rgb(16 16 32 / 0.18), 0 2px 6px rgb(16 16 32 / 0.06);
+}
+
+html { -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01", "ss03"; }
+body { background: var(--color-canvas); color: var(--color-ink); }
+::selection { background: var(--color-brand-100); }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.animate-in { animation: fade-up .25s ease-out both; }

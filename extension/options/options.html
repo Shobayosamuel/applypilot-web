@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>ApplyPilot settings</title>
+  <link rel="stylesheet" href="../popup/popup.css" />
+  <style>
+    body { width: auto; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>ApplyPilot settings</h1>
+  <form id="f">
+    <label>API URL<input id="apiUrl" type="url" required placeholder="http://localhost:8080" /></label>
+    <label>Dashboard URL<input id="webUrl" type="url" required placeholder="http://localhost:3000" /></label>
+    <p class="muted">Change these when you deploy ApplyPilot (e.g. https://api.yourdomain.com and https://app.yourdomain.com). Changing them signs you out.</p>
+    <p></p>
+    <button class="btn primary" type="submit">Save</button>
+    <p id="ok" class="msg hidden">Saved.</p>
+  </form>
+  <script src="options.js"></script>
+</body>
+</html>

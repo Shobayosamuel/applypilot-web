@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><title>Backend Engineer - Paystack Test</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"JobPosting","title":"Backend Engineer, Payments","hiringOrganization":{"@type":"Organization","name":"TestPay"},
+ "jobLocation":{"@type":"Place","address":{"addressLocality":"Lagos","addressCountry":"NG"}},
+ "description":"<p>We are hiring a backend engineer to build our payments ledger in Go. You will design double-entry systems, integrate with card networks, and run RabbitMQ consumers at scale.</p><ul><li>3+ years Go</li><li>Postgres</li><li>Kubernetes</li></ul><p>Remote friendly within Africa. Competitive salary and equity.</p>"}
+</script></head>
+<body>
+<h1>Backend Engineer, Payments</h1>
+<form id="app" onsubmit="event.preventDefault(); document.body.innerHTML='<h2>Thank you, application received</h2>'">
+  <div class="field"><label for="fn">First Name *</label><input id="fn" name="first_name" required></div>
+  <div class="field"><label for="ln">Last Name *</label><input id="ln" name="last_name" required></div>
+  <div class="field"><label for="em">Email *</label><input id="em" type="email" name="email" required></div>
+  <div class="field"><label for="ph">Phone</label><input id="ph" name="phone"></div>
+  <div class="field"><label for="li">LinkedIn Profile</label><input id="li" name="urls[LinkedIn]"></div>
+  <div class="field"><label for="loc">Location (City)</label><input id="loc" name="location"></div>
+  <div class="field"><label for="cv">Resume/CV *</label><input id="cv" type="file" name="resume"></div>
+  <div class="field"><label for="sp">Will you now or in the future require visa sponsorship?</label>
+    <select id="sp"><option value="">Select...</option><option value="1">Yes</option><option value="0">No</option></select></div>
+  <fieldset><legend>Are you legally authorized to work in Nigeria?</legend>
+    <label><input type="radio" name="auth" value="y"> Yes</label><label><input type="radio" name="auth" value="n"> No</label></fieldset>
+  <div class="field"><label for="hear">How did you hear about us?</label>
+    <select id="hear"><option value="">Select...</option><option>LinkedIn</option><option>Company website</option><option>Referral</option></select></div>
+  <div class="field"><label for="yrs">Years of Go experience</label>
+    <select id="yrs"><option value="">Select...</option><option>0-2</option><option>3-5</option><option>6+</option></select></div>
+  <div class="field"><label for="g">Gender</label>
+    <select id="g"><option value="">Select...</option><option>Male</option><option>Female</option><option>Decline to self identify</option></select></div>
+  <div class="field"><label for="why">Why do you want to work at TestPay?</label><textarea id="why" maxlength="800"></textarea></div>
+  <div class="field"><label><input type="checkbox" id="consent"> I agree to the privacy policy</label></div>
+  <button type="submit">Submit Application</button>
+</form>
+<script>
+  // React-style controlled input check: record whether an input event fired.
+  window.events = 0; document.getElementById('fn').addEventListener('input', () => window.events++);
+</script>
+</body></html>

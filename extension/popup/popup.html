@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17 L10 7 L14 13 L20 5"/><path d="M15.5 5H20v4.5"/></svg></span>ApplyPilot</div>
+    <a id="settings" title="Settings" style="font-weight:500;color:#6b6b7b">Settings</a>
+  </header>
+
+  <section id="loading" class="pad muted">Loading…</section>
+
+  <section id="signedOut" class="pad hidden">
+    <form id="loginForm">
+      <label>Email<input type="email" id="email" required autocomplete="email" /></label>
+      <label>Password<input type="password" id="password" required autocomplete="current-password" /></label>
+      <p id="loginErr" class="err hidden"></p>
+      <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
+    </form>
+    <p class="muted center">No account? <a id="signup">Create one</a></p>
+  </section>
+
+  <section id="signedIn" class="pad hidden">
+    <p class="muted" id="who"></p>
+    <div id="jobBox" class="job hidden"><b id="jobTitle"></b><span class="muted" id="jobMeta"></span></div>
+    <button class="btn primary" id="fill">Autofill this page</button>
+    <button class="btn" id="save">Save this job</button>
+    <button class="btn" id="dash">Open dashboard</button>
+    <p id="msg" class="msg hidden"></p>
+    <div class="foot">
+      <span class="muted" id="usage"></span>
+      <a id="logout">Sign out</a>
+    </div>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
