@@ -51,6 +51,24 @@ export async function api<T = unknown>(path: string, init: RequestInit & { json?
   return res.json();
 }
 
+// downloadFile fetches a binary response (e.g. a generated PDF) and returns
+// it with the filename the server suggested via Content-Disposition.
+export async function downloadFile(path: string): Promise<{ blob: Blob; filename: string }> {
+  const headers = new Headers();
+  const token = getToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const res = await fetch(`${API_URL}/api${path}`, { headers });
+  if (!res.ok) {
+    let msg = res.statusText;
+    try {
+      msg = (await res.json()).error || msg;
+    } catch {}
+    throw new ApiError(res.status, msg);
+  }
+  const match = /filename="?([^";]+)"?/.exec(res.headers.get("Content-Disposition") || "");
+  return { blob: await res.blob(), filename: match ? match[1] : "download" };
+}
+
 // ---------- types ----------
 
 export type User = { id: string; email: string; name: string; created_at: string };
@@ -170,6 +188,7 @@ export type Profile = {
 };
 
 export type TailoredResume = {
+  generation_id: string;
   headline: string;
   summary: string;
   skills: string[];

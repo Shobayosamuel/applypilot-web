@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Check, ChevronRight, Copy, ExternalLink, FileText, Gauge, History, MapPin, MessageSquareText, Pencil, Sparkles, Trash2, Wallet, Wand2 } from "lucide-react";
-import { api, JOB_STATUSES, type Generation, type Job, type JobStatus, type MatchResult, type TailoredResume } from "@/lib/api";
+import { Check, ChevronRight, Copy, Download, ExternalLink, FileText, Gauge, History, MapPin, MessageSquareText, Pencil, Sparkles, Trash2, Wallet, Wand2 } from "lucide-react";
+import { api, downloadFile, JOB_STATUSES, type Generation, type Job, type JobStatus, type MatchResult, type TailoredResume } from "@/lib/api";
 import { Button, Card, CardHeader, CompanyAvatar, ErrorText, Field, Input, STATUS_META, ScoreRing, Select, Skeleton, Spinner, Textarea, cn, hostOf, scoreTone, timeAgo } from "@/components/ui";
 
 type Tab = "match" | "cover" | "tailor" | "answer" | "history";
@@ -247,6 +247,36 @@ function Chips({ title, items, tone }: { title: string; items: string[]; tone: "
   );
 }
 
+function DownloadPDFButton({ generationId }: { generationId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function download() {
+    setBusy(true);
+    setErr("");
+    try {
+      const { blob, filename } = await downloadFile(`/ai/generations/${generationId}/resume.pdf`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <span className="relative">
+      <Button variant="secondary" size="sm" loading={busy} icon={<Download size={14} />} onClick={download}>
+        PDF
+      </Button>
+      {err && <span className="absolute right-0 top-full mt-1 whitespace-nowrap text-[11px] text-red-600">{err}</span>}
+    </span>
+  );
+}
+
 function CopyButton({ text }: { text: string }) {
   const [done, setDone] = useState(false);
   return (
@@ -314,7 +344,10 @@ function TailorTab({ job }: { job: Job }) {
         <div className="animate-in rounded-xl border border-line">
           <div className="flex items-center justify-between border-b border-line px-5 py-2.5">
             <span className="text-xs font-medium text-muted">Tailored content</span>
-            <CopyButton text={asText} />
+            <div className="flex gap-2">
+              <DownloadPDFButton generationId={t.generation_id} />
+              <CopyButton text={asText} />
+            </div>
           </div>
           <div className="space-y-5 p-5 text-sm">
             <div>

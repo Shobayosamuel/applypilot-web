@@ -754,13 +754,14 @@
                 <button class="btn" id="save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Save job</button>
                 <button class="btn" id="match"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg> Match</button>
               </div>
+              <button class="btn" id="tailor"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 1.9 1.9.8-1.9.8L19 20.4l-.8-1.9-1.9-.8 1.9-.8z"/></svg> Tailor resume</button>
               <div id="out" class="hidden"></div>
             </div>
           </div>
           <div class="ft" id="ft"><span class="muted">Review before submitting</span><a id="dash">Dashboard <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a></div>
         </div>`;
       const $ = (id) => root.getElementById(id);
-      els = { pill: $("pill"), card: $("card"), job: $("job"), fill: $("fill"), save: $("save"), match: $("match"), out: $("out"), status: $("status"), signedIn: $("signedIn"), signedOut: $("signedOut") };
+      els = { pill: $("pill"), card: $("card"), job: $("job"), fill: $("fill"), save: $("save"), match: $("match"), tailor: $("tailor"), out: $("out"), status: $("status"), signedIn: $("signedIn"), signedOut: $("signedOut") };
       $("min").onclick = () => collapse(true);
       els.pill.onclick = () => collapse(false);
       $("signin").onclick = () => bg({ type: "openDashboard", path: "/login" });
@@ -768,6 +769,7 @@
       els.fill.onclick = runAutofill;
       els.save.onclick = () => saveJob();
       els.match.onclick = runMatch;
+      els.tailor.onclick = runTailor;
       document.documentElement.appendChild(host);
     }
 
@@ -887,6 +889,35 @@
       } finally {
         busy(els.match, false);
       }
+    }
+
+    async function runTailor() {
+      busy(els.tailor, true, "Tailoring…");
+      try {
+        const saved = state.saved || (await saveJob());
+        if (!saved) return;
+        const t = await api("/ai/tailor-resume", "POST", { job_id: saved.id });
+        renderTailor(t);
+      } catch (e) {
+        out(escapeHtml(e.message), "err");
+      } finally {
+        busy(els.tailor, false);
+      }
+    }
+
+    function renderTailor(t) {
+      out(`<div><b>${escapeHtml(t.headline || "Tailored resume ready")}</b></div>
+           <div class="muted" style="margin-top:4px">${escapeHtml(t.summary || "")}</div>
+           <button class="btn" id="dlpdf" style="margin-top:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4M4 21h16"/></svg> Download tailored resume (PDF)</button>`, "ok");
+      const btn = els.out.querySelector("#dlpdf");
+      if (btn) btn.onclick = () => downloadTailoredPdf(t.generation_id, btn);
+    }
+
+    async function downloadTailoredPdf(generationId, btn) {
+      busy(btn, true, "Preparing…");
+      const r = await bg({ type: "downloadResumePdf", generationId });
+      busy(btn, false);
+      if (!r.ok) out(escapeHtml(r.error || "Could not download the PDF."), "err");
     }
 
     function onApplied(job) {

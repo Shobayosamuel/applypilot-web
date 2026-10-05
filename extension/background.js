@@ -63,6 +63,35 @@ async function getResume() {
   };
 }
 
+// Fetches a tailored resume PDF and saves it with chrome.downloads (content
+// scripts can't call that API directly, so the panel asks the background page).
+async function downloadResumePdf(generationId) {
+  const { apiUrl, token } = await settings();
+  if (!token) return { ok: false, error: "Not signed in" };
+  let res;
+  try {
+    res = await fetch(`${apiUrl}/api/ai/generations/${generationId}/resume.pdf`, { headers: { Authorization: `Bearer ${token}` } });
+  } catch (e) {
+    return { ok: false, error: `Can't reach ApplyPilot API at ${apiUrl}` };
+  }
+  if (!res.ok) {
+    let msg = `Could not generate the PDF (${res.status})`;
+    try { const j = await res.json(); if (j.error) msg = j.error; } catch {}
+    return { ok: false, error: msg };
+  }
+  const buf = new Uint8Array(await res.arrayBuffer());
+  let bin = "";
+  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+  const match = /filename="?([^";]+)"?/.exec(res.headers.get("Content-Disposition") || "");
+  const filename = match ? match[1] : "resume.pdf";
+  try {
+    const id = await chrome.downloads.download({ url: `data:application/pdf;base64,${btoa(bin)}`, filename, saveAs: false });
+    return { ok: true, data: { downloadId: id } };
+  } catch (e) {
+    return { ok: false, error: "Download failed: " + (e.message || e) };
+  }
+}
+
 // Per-tab job context so iframes (e.g. embedded Greenhouse forms) can use the
 // job details the top frame extracted.
 const tabJobs = new Map();
@@ -86,6 +115,8 @@ async function handle(msg, sender) {
       return getProfile(msg.force);
     case "resume":
       return getResume();
+    case "downloadResumePdf":
+      return downloadResumePdf(msg.generationId);
     case "login": {
       const r = await api("/auth/login", { method: "POST", body: { email: msg.email, password: msg.password } });
       if (!r.ok) return r;
